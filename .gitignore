@@ -1,0 +1,5 @@
+*.asv
+*.mat~
+slprj/
+*.slx.r2*
+*.autosave
