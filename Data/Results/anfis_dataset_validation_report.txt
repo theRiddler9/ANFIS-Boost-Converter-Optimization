@@ -1,0 +1,29 @@
+=================================================================
+                ANFIS DATASET VALIDATION SUITE                   
+=================================================================
+
+Validation Date: 22-Oct-2026 16:11:43
+
+[PASS] Check 1: File existence of Train, Val, Test CSVs
+[PASS] Check 2: Column schema & dimensions (Train: 8000, Val: 2000, Test: 2000)
+[PASS] Check 3: Absence of NaN and Inf values across all columns
+[PASS] Check 4: Duty cycle limits [0.05, 0.95] (Observed range: [0.0500, 0.9500])
+[PASS] Check 5: Split independence (Train runs: 16, Val runs: 4, Test runs: 4, 0 overlap)
+[PASS] Check 6: Physical plausibility (Vout_min=0.00V, iL_min=0.000A, Vin in [15.0, 25.0]V)
+
+--- Variable Statistics Across Entire Dataset ---
+Variable           | Min        | Max        | Mean       | StdDev    
+-----------------------------------------------------------------
+Vin_V              |    15.0000 |    25.0000 |    20.0167 |     2.6756
+Vref_V             |     0.0000 |    45.0000 |    38.0432 |     7.3766
+Vout_V             |     0.0000 |    52.5947 |    37.3229 |    11.2870
+iL_A               |     0.0000 |     5.0000 |     2.0179 |     2.3533
+error_V            |   -12.5947 |    26.0302 |     0.7202 |     7.5059
+error_diff_V       |    -4.9991 |     5.0009 |    -0.0006 |     0.0665
+error_deriv_Vps    | -4749.2284 |   181.4084 |  -862.6605 |  1401.6797
+duty_target        |     0.0500 |     0.9500 |     0.5158 |     0.1805
+
+=================================================================
+VALIDATION SUMMARY: 6 PASSED, 0 FAILED
+OVERALL STATUS: PASS
+=================================================================
