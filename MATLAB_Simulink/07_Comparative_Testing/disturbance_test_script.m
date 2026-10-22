@@ -12,7 +12,8 @@ p = boost_converter_params();
 
 pidData.Kp = 0.002; pidData.Ki = 0.3; pidData.Kd = 0.00002;
 fuzzyFis = readfis(fullfile('..', '03_Manual_Fuzzy_Controller', 'fuzzy_49rules.fis'));
-anfisFis = readfis(fullfile('..', '05_ANFIS_Training', 'anfis_model.fis'));
+anfisFis = readfis(fullfile('..', ...
+    '06_ANFIS_Deployment', 'anfis_trained.fis'));
 
 controllers = {'PID', pidData; 'FUZZY', fuzzyFis; 'ANFIS', anfisFis};
 

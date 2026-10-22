@@ -27,18 +27,34 @@ prev_err = 0;
 for k = 1:N
     Vin = Vin_profile(t(k));
     e   = p.Vref - x(2);
-    de  = (e - prev_err) / p.dt;
+    de = e - prev_err;
 
-    switch upper(controller_type)
-        case 'PID'
-            [dk, int_err] = pid_controller(e, int_err, prev_err, ...
-                controller_data.Kp, controller_data.Ki, controller_data.Kd, p.dt, p);
-        case {'FUZZY', 'ANFIS'}
-            dk = evalfis(controller_data, [e, de]);
-            dk = min(max(dk, p.d_min), p.d_max);
-        otherwise
-            error('Unknown controller_type: %s', controller_type);
-    end
+switch upper(controller_type)
+    case 'PID'
+        [dk, int_err] = pid_controller(e, int_err, prev_err, ...
+            controller_data.Kp, controller_data.Ki, ...
+            controller_data.Kd, p.dt, p);
+
+    case 'FUZZY'
+        fuzzyError = min(max(e, -50), 50);
+        fuzzyDError = min(max(de, -500), 500);
+
+        dk = evalfis(controller_data, ...
+            [fuzzyError, fuzzyDError]);
+        dk = min(max(dk, p.d_min), p.d_max);
+
+    case 'ANFIS'
+        % Use the same feature definition as the training dataset.
+        anfisError = min(max(e, -12.595), 26.03);
+        anfisDError = min(max(de, -4.9991), 5.0009);
+
+        dk = evalfis(controller_data, ...
+            [anfisError, anfisDError]);
+        dk = min(max(dk, p.d_min), p.d_max);
+
+    otherwise
+        error('Unknown controller_type: %s', controller_type);
+end
 
     % Integrate one step (simple fixed-step Euler is fine at dt=1us)
     dx = boost_converter_ode(x, dk, Vin, p);

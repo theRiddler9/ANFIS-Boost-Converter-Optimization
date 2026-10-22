@@ -14,7 +14,8 @@ pidData.Ki = 0.3;     % tune these to reasonably match your base paper's
 pidData.Kd = 0.00002; % PID benchmark numbers
 
 fuzzyFis = readfis(fullfile('..', '03_Manual_Fuzzy_Controller', 'fuzzy_49rules.fis'));
-anfisFis = readfis(fullfile('..', '05_ANFIS_Training', 'anfis_model.fis'));
+anfisFis = readfis(fullfile('..', ...
+    '06_ANFIS_Deployment', 'anfis_trained.fis'));
 
 controllers = {
     'PID',   pidData;
