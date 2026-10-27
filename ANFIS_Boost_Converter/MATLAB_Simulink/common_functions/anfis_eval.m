@@ -23,6 +23,21 @@ else
     d_max = p.d_max;
 end
 
+% Apply the common controller scaling before evaluating the learned model.
+errorScale = 40;
+derivativeScale = 200;
+if nargin >= 4 && isfield(p, 'error_scale'), errorScale = p.error_scale; end
+if nargin >= 4 && isfield(p, 'derivative_scale'), derivativeScale = p.derivative_scale; end
+en = min(max(e / errorScale, -1), 1);
+den = min(max(de / derivativeScale, -1), 1);
+
+% FIS objects are evaluated directly using the common scaled inputs.
+if isobject(anfisModel)
+    d = evalfis(anfisModel, [en den]);
+    d = min(max(double(d), d_min), d_max);
+    return;
+end
+
 % If anfisModel is a char / path, load it
 if ischar(anfisModel) || isstring(anfisModel)
     anfisModel = load_fis_or_mat(anfisModel);
@@ -43,7 +58,7 @@ for i = 1:5
     a = params1(i, 1);
     b = params1(i, 2);
     c = params1(i, 3);
-    denom = 1 + abs((e - c) / max(a, 1e-6))^(2 * b);
+    denom = 1 + abs((en - c) / max(a, 1e-6))^(2 * b);
     mu1(i) = 1 / max(denom, 1e-12);
 end
 
@@ -52,7 +67,7 @@ for j = 1:5
     a = params2(j, 1);
     b = params2(j, 2);
     c = params2(j, 3);
-    denom = 1 + abs((de - c) / max(a, 1e-6))^(2 * b);
+    denom = 1 + abs((den - c) / max(a, 1e-6))^(2 * b);
     mu2(j) = 1 / max(denom, 1e-12);
 end
 
@@ -80,7 +95,7 @@ for r = 1:25
     p_coef = conseq(r, 1);
     q_coef = conseq(r, 2);
     r_const = conseq(r, 3);
-    f_r = p_coef * e + q_coef * de + r_const;
+    f_r = p_coef * en + q_coef * den + r_const;
     d_raw = d_raw + w_norm(r) * f_r;
 end
 
@@ -98,7 +113,7 @@ function model = load_fis_or_mat(filePath)
             model = loaded;
         end
     elseif endsWith(filePath, '.fis')
-        model = parse_fis_file(filePath);
+        model = readfis(filePath);
     else
         error('Unsupported file format: %s', filePath);
     end

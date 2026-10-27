@@ -1,0 +1,6 @@
+slprj/
+*.slxc
+*.autosave
+*.asv
+Data/Raw_SimData/*
+!Data/Raw_SimData/.gitkeep

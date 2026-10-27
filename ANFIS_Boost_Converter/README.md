@@ -22,11 +22,11 @@ This repository contains the complete implementation and rectification of the **
 ### 3. Step 3: Retrained ANFIS Using Early Stopping
 * **Symmetrical & Balanced Membership Functions:** Initialized 5 generalized bell MFs per input with centers symmetrically spanning negative, zero, and positive error derivatives $[-3000, 3000]\text{ V/s}$ (fixing the legacy FIS which had only positive derivative centers).
 * **Regularized Consequent Estimation:** Applied ridge regression ($\lambda = 10^{-4}$) to solve the 75 first-order Sugeno consequent parameters, preventing explosive coefficient spikes ($+573.8, -712.4$ in legacy model).
-* **Early Stopping at Validation Minimum:** Monitored training and validation RMSE curves over 40 epochs. Checkpointed the exact model at the validation minimum, preventing the divergence and overfitting observed in unstopped 40-epoch runs.
+* **Early Stopping at Validation Minimum:** Monitored training and validation RMSE curves over 40 epochs. With the rectified clamped inputs, the deployed checkpoint is the validation minimum at **epoch 9** (the study recommendation of approximately epoch 22 is treated as a diagnostic reference, not a forced value).
 * **Validation & Test Metrics:**
-  * Held-out Test RMSE: **0.0624** (vs. 0.0792 originally)
-  * Held-out Test MAE: **0.0491** (vs. 0.0565 originally)
-  * Held-out Max Error: **0.1452** (vs. 0.4667 originally)
+  * Held-out Test RMSE: **0.0711**
+  * Held-out Test MAE: **0.0584**
+  * Held-out Max Error: **0.3293**
 
 ### 4. Step 4: Comprehensive Evaluation on Held-Out Test Profiles
 * **8 Independent Disturbance Scenarios:**
@@ -46,13 +46,13 @@ This repository contains the complete implementation and rectification of the **
 
 | Metric | Original Paper PID | Original Paper Fuzzy | Original Paper ANFIS | **Retrained ANFIS (This Work)** | **Rectified PID** | **Rectified Fuzzy** |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Steady-State Error ($e_{ss}$)** | 9.64 V | 10.24 V | 27.00 V | **1.04 V** | 4.96 V | 6.35 V |
+| **Steady-State Error ($e_{ss}$)** | 9.64 V | 10.24 V | 27.00 V | **2.40 V** | 4.96 V | 6.78 V |
 | **Response Time ($t_r$)** | NaN | 4.58 ms | 2.68 ms | **2.35 ms** | 2.48 ms | 2.39 ms |
-| **Overshoot ($OS\%$)** | 0.00%* | 143.68% | 67.53% | **47.34%** | 51.28% | 51.15% |
+| **Overshoot ($OS\%$)** | 0.00%* | 143.68% | 67.53% | **52.16%** | 51.28% | 58.26% |
 | **Settling Time ($t_s$, 2%)** | 49.99 ms* | 49.99 ms* | 49.99 ms* | **Measured on 300ms** | 300.0 ms | 300.0 ms |
-| **IAE ($\text{V}\cdot\text{s}$)** | *Unavailable* | *Unavailable* | *Unavailable* | **1.979** | 2.347 | 2.960 |
-| **ISE ($\text{V}^2\cdot\text{s}$)** | *Unavailable* | *Unavailable* | *Unavailable* | **23.57** | 29.94 | 35.38 |
-| **ITAE ($\text{V}\cdot\text{s}^2$)** | *Unavailable* | *Unavailable* | *Unavailable* | **0.155** | 0.215 | 0.343 |
+| **IAE ($\text{V}\cdot\text{s}$)** | *Unavailable* | *Unavailable* | *Unavailable* | **2.238** | 2.347 | 3.434 |
+| **ISE ($\text{V}^2\cdot\text{s}$)** | *Unavailable* | *Unavailable* | *Unavailable* | **30.12** | 29.94 | 47.36 |
+| **ITAE ($\text{V}\cdot\text{s}^2$)** | *Unavailable* | *Unavailable* | *Unavailable* | **0.177** | 0.215 | 0.395 |
 
 *\* Note: In the original paper, settling time was truncated at 49.99 ms because the window was only 50 ms. PID overshoot was 0% only because the output never reached 40 V.*
 
@@ -118,3 +118,7 @@ run('MATLAB_Simulink/05_ANFIS_Training/train_anfis_from_dataset.m');
 run('MATLAB_Simulink/07_Comparative_Testing/run_all_controllers.m');
 run('MATLAB_Simulink/07_Comparative_Testing/disturbance_test_script.m');
 ```
+
+### Verified Simulink status
+
+The unified comparison model was loaded and simulated for 300 ms with complete numerical logs. PID and Fuzzy finish at **40.01 V** and **39.97 V**, respectively. ANFIS is finite but finishes at **49.63 V** after a peak of **89.72 V**; this remains an open controller/model integration issue and is not hidden by substituting MATLAB-backend numbers. The four individual smoke simulations (`openloop`, `PID`, `fuzzy`, and `ANFIS`) all pass without simulation errors. The Python path is currently unavailable in this environment because its `pandas` dependency is not installed; the MATLAB path is the verified path.

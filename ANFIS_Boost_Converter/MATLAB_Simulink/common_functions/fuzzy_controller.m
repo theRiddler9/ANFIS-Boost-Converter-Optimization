@@ -18,9 +18,13 @@ else
     d_max = p.d_max;
 end
 
-% Normalized inputs per Model 3 specification
-en = min(max(e / 40, -1), 1);
-dn = min(max(de / 200, -1), 1);
+% Common normalized inputs shared with ANFIS.
+errorScale = 40;
+derivativeScale = 200;
+if nargin >= 3 && isfield(p, 'error_scale'), errorScale = p.error_scale; end
+if nargin >= 3 && isfield(p, 'derivative_scale'), derivativeScale = p.derivative_scale; end
+en = min(max(e / errorScale, -1), 1);
+dn = min(max(de / derivativeScale, -1), 1);
 
 % Seven triangular membership-function centers: NB, NM, NS, Z, PS, PM, PB
 c = [-1, -2/3, -1/3, 0, 1/3, 2/3, 1];

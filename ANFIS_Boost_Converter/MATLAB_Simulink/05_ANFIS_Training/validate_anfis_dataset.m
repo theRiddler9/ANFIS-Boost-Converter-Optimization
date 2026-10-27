@@ -64,7 +64,9 @@ valData   = readtable(valCsv);
 testData  = readtable(testCsv);
 
 %% Check 2: Dimension and Non-Empty Checks
-reqCols = {'run_id', 'time_s', 'Vin_V', 'Vref_V', 'Vout_V', 'iL_A', 'error_V', 'error_diff_V', 'error_deriv_Vps', 'duty_target'};
+% The generator stores the filtered derivative as error_deriv_Vps. Older
+% artifacts used error_diff_V; do not require that obsolete column.
+reqCols = {'run_id', 'time_s', 'Vin_V', 'Vref_V', 'Vout_V', 'iL_A', 'error_V', 'error_deriv_Vps', 'duty_target'};
 hasCols = all(ismember(reqCols, trainData.Properties.VariableNames)) && ...
           all(ismember(reqCols, valData.Properties.VariableNames)) && ...
           all(ismember(reqCols, testData.Properties.VariableNames));
@@ -149,7 +151,7 @@ end
 %% Summary Statistics Table
 fprintf('\n--- Variable Statistics Across Entire Dataset ---\n');
 fprintf(repFid, '\n--- Variable Statistics Across Entire Dataset ---\n');
-varList = {'Vin_V', 'Vref_V', 'Vout_V', 'iL_A', 'error_V', 'error_diff_V', 'error_deriv_Vps', 'duty_target'};
+varList = {'Vin_V', 'Vref_V', 'Vout_V', 'iL_A', 'error_V', 'error_deriv_Vps', 'duty_target'};
 fprintf('%-18s | %-10s | %-10s | %-10s | %-10s\n', 'Variable', 'Min', 'Max', 'Mean', 'StdDev');
 fprintf(repFid, '%-18s | %-10s | %-10s | %-10s | %-10s\n', 'Variable', 'Min', 'Max', 'Mean', 'StdDev');
 fprintf('%s\n', repmat('-', 1, 65));

@@ -27,5 +27,7 @@ p.Tsim    = 0.3;       % s, extended duration to capture full settling behavior
 p.d_min   = 0.05;      % duty cycle lower saturation limit (unified across controllers)
 p.d_max   = 0.95;      % duty cycle upper saturation limit (unified across controllers)
 p.tau_f   = 0.002;     % s, derivative filter time constant (s / (tau_f*s + 1))
+p.error_scale = 40;     % V, common controller input scale
+p.derivative_scale = 200; % V/s, common controller input scale
 
 end
